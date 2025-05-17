@@ -1,0 +1,35 @@
+
+  .wizard-steps .step {
+    width: 40px;
+    height: 40px;
+    line-height: 40px;
+    border-radius: 50%;
+    background-color: #ccc;
+    color: white;
+    text-align: center;
+    font-weight: bold;
+    transition: background-color 0.3s;
+  }
+
+  .wizard-steps .step.active {
+    background-color: #0d6efd; /* Azul Bootstrap */
+  }
+
+.wizard-card {
+  background-color: #fff;
+  max-width: 700px;
+  margin: 0 auto;
+  min-height: 500px; /* ajustable */
+  display: flex;
+  flex-direction: column;
+}
+.fade-step {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.fade-step.show {
+  opacity: 1;
+  transform: translateY(0);
+}

@@ -1,0 +1,75 @@
+<body [ngClass]="{'mobile-nav-active': !navbarCollapsed,}">
+  <header id="header" class="header d-flex align-items-center shadow">
+    <div
+      class="container-fluid d-flex align-items-center justify-content-between"
+    >
+      <a href="index.html" class="logo d-flex align-items-center me-auto me-xl-0">
+        <!-- Uncomment the line below if you also wish to use an image logo -->
+        <!-- <img src="assets/img/logo.png" alt=""> -->
+        <h1>Renta facil</h1>
+        <span>.</span>
+      </a>
+  
+      <!-- Nav Menu --> 
+      <nav id="navmenu" class="navmenu">
+        <ul >
+          
+          <li *ngIf="ValidateRole('Reservas')">
+            <a
+              id="bookingMenu"
+              [routerLink]="['/booking']"
+              routerLinkActive="active"
+              [routerLinkActiveOptions]="{ exact: true }"
+              class="menuTitle"
+              (click)="navbarCollapsed = true"
+              >Reservar</a
+            >
+          </li>
+          <li *ngIf="ValidateRole('Vehículos')">
+            <a
+              id="vehicleMenu"
+              [routerLink]="['/vehicle']"
+              routerLinkActive="active"
+              [routerLinkActiveOptions]="{ exact: true }"
+              class="menuTitle"
+              (click)="navbarCollapsed = true"
+              >Vehiculos</a
+            >
+          </li>
+          
+          
+          <li *ngIf="logged">
+            <a 
+              id="filesLogOut"
+              class="menuTitle  d-xl-none"
+              (click)="navbarCollapsed = true; logout()"
+              >Cerrar sesión</a
+            >
+          </li>
+
+          <li *ngIf="!logged">
+            <a 
+              id="filesLogOut"
+              class="menuTitle  d-xl-none"
+              (click)="navbarCollapsed = true"
+              href="/login"
+              >Iniciar sesión</a
+            >
+          </li>
+        </ul>
+  
+        <i class="mobile-nav-toggle d-xl-none bi" [ngClass]="{'bi-list': navbarCollapsed, 'bi-x': !navbarCollapsed}" (click)="navbarCollapsed = !navbarCollapsed"></i>
+      </nav>
+      <!-- End Nav Menu -->
+  
+      <!-- Iniciar Sesión como texto en resolución no móvil -->
+      <a *ngIf="!logged" class="btn-getstarted d-none d-xl-block" href="/login">Iniciar sesión</a>
+
+      <!-- Iniciar Sesión como texto en resolución no móvil -->
+      <a *ngIf="logged" class="btn-getstarted d-none d-xl-block cursorPointer" (click)="logout()">Cerrar sesión</a>
+
+    </div>
+  </header>
+  <!-- End Header -->
+  
+</body>

@@ -1,0 +1,35 @@
+<div class="wrapper fadeInDown">
+    <div id="formContent">
+      <div class="fadeIn first">
+        <img src="\assets\images\logo.jpeg" id="icon" alt="User Icon" />
+      </div>
+      <div id="formLogin" class="d-block">
+        <form (submit)="login()">
+          <input
+           [(ngModel)]="userForm.username"
+            type="text"
+            id="correoIngresado"
+            name="correoIngresado"
+            (focus)="isValidCredentials=true"
+            required
+            class="fadeIn second"
+            placeholder="Correo"
+          />
+          <input
+          [(ngModel)]="userForm.password"
+            (focus)="isValidCredentials=true"
+            type="password"
+            id="password"
+            name="password"
+            required
+            class="fadeIn third"
+            placeholder="Contraseña"
+          />
+          <a *ngIf="!isValidCredentials" style="color: red; display: block;">Credenciales invalidas.</a>
+          <input type="submit" class="fadeIn fourth" value="Iniciar sesión" />
+        </form>
+      </div>
+      
+    </div>
+  </div>
+  

@@ -1,0 +1,82 @@
+<div class="container mt-5">
+    <div class="wizard-steps mb-4 d-flex justify-content-between">
+        <div class="step" id="indicator-1">1</div>
+        <div class="step" id="indicator-2">2</div>
+        <div class="step" id="indicator-3">3</div>
+    </div>
+  
+    <div class="wizard-card p-4 shadow rounded d-flex flex-column" style="min-height: 500px;">
+        <div id="step-1" class="flex-grow-1 d-flex flex-column fade-step show">
+            <div class="mb-3 flex-grow-1">
+                <h4>Paso 1: Selecciona el tipo de vehículo</h4>
+                 <div class="mb-3">
+                    <label for="tipoVehiculo" class="form-label">Tipo de vehículo</label>
+                    <select id="tipoVehiculo" class="form-select" [(ngModel)]="vehicleAvailability.VehicleType" (change)="getAvailableVehicles()">
+                    <option value="0" selected disabled>Seleccione un tipo</option>
+                    <option *ngFor="let type of vehicleTypes" [value]="type.id">{{type.name}}</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="rangoFechas" class="form-label">Rango de fechas</label>
+                    <input type="text" id="rangoFechas" class="form-control" placeholder="Selecciona un rango de fechas">
+                </div>
+                <div class="mb-3" *ngIf="availableVehicles">
+                    <h5>Vehículos disponibles</h5>
+                    <select id="Vehiculo" class="form-select" [(ngModel)]="selectedVehicleId" >
+                    <option value="0" selected disabled>Seleccione un vehiculo</option>
+                    <option *ngFor="let vehicle of availableVehicles" [value]="vehicle.id">{{vehicle.brand}} - {{vehicle.model}} - {{vehicle.year}} </option>
+                    </select>
+                </div>
+            </div>
+            <div class="d-flex justify-content-end gap-2 mt-3" *ngIf="selectedVehicleId>0">
+                <button class="btn btn-primary" (click)="nextStep(2)">Siguiente</button>
+            </div>
+        </div>
+
+        <!-- Paso 2 y 3 siguen igual, solo ajustando al mismo layout -->
+        <!-- Usa flex-grow-1 en el contenido, y los botones van al final -->
+        <div id="step-2" class="flex-grow-1 d-flex flex-column fade-step d-none">
+            <div class="mb-3 flex-grow-1">
+                <h4>Paso 2: Datos del cliente</h4>
+                <div class="mb-3">
+                    <label for="documento" class="form-label">Documento</label>
+                    <input type="text" id="documento" class="form-control" [(ngModel)]="client.document" (blur)="getClientByDocument()">
+                </div>
+                <div class="mb-3">
+                    <label for="nombre" class="form-label">Nombre completo</label>
+                    <input type="text" id="nombre" class="form-control" [(ngModel)]="client.fullName">
+                </div>
+                <div class="mb-3">
+                    <label for="telefono" class="form-label">Teléfono</label>
+                    <input type="text" id="telefono" class="form-control" [(ngModel)]="client.email">
+                </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label">Correo electrónico</label>
+                    <input type="email" id="email" class="form-control" [(ngModel)]="client.phone">
+                </div>
+            </div>
+            <div class="d-flex justify-content-end gap-2 mt-3">
+                <button class="btn btn-secondary" (click)="prevStep(1)">Anterior</button>
+                <button class="btn btn-primary" (click)="nextStep(3)">Siguiente</button>
+            </div>
+        </div>
+
+        <div id="step-3" class="flex-grow-1 d-flex flex-column fade-step d-none">
+            <div class="mb-3 flex-grow-1">
+                <h4>Paso 3: Confirmación</h4>
+                <p>Revisa los detalles antes de confirmar:</p>
+                <ul class="list-group mb-3">
+                    <li class="list-group-item"><strong>Vehículo:</strong> <span id="resumenTipo"></span></li>
+                    <li class="list-group-item"><strong>Fechas:</strong> <span id="resumenFechas"></span></li>
+                    <li class="list-group-item"><strong>Cliente:</strong> <span id="resumenCliente"></span></li>
+                    <li class="list-group-item"><strong>Valor a cancelar:</strong> <span id="resumenValor"></span></li>
+                </ul>
+            </div>
+            <div class="d-flex justify-content-end gap-2 mt-3">
+                <button class="btn btn-secondary" (click)="prevStep(2)">Anterior</button>
+                <button class="btn btn-success" (click)="confirmarReserva()">Confirmar y Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
