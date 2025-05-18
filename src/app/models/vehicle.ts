@@ -4,6 +4,6 @@ export class Vehicle{
     public brand: string;
     public model: string;
     public year: number;
-    public vehicleTypeId: number;
+    public vehicleTypeId: number = 0;
     public bookingValuePerDay: number;
 }

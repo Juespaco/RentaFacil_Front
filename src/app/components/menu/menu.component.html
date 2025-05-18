@@ -3,11 +3,10 @@
     <div
       class="container-fluid d-flex align-items-center justify-content-between"
     >
-      <a href="index.html" class="logo d-flex align-items-center me-auto me-xl-0">
+      <a  class="logo d-flex align-items-center me-auto me-xl-0">
         <!-- Uncomment the line below if you also wish to use an image logo -->
         <!-- <img src="assets/img/logo.png" alt=""> -->
         <h1>Renta facil</h1>
-        <span>.</span>
       </a>
   
       <!-- Nav Menu --> 
@@ -23,6 +22,17 @@
               class="menuTitle"
               (click)="navbarCollapsed = true"
               >Reservar</a
+            >
+          </li>
+          <li *ngIf="ValidateRole('Historial de Reservas')">
+            <a
+              id="bookingMenu"
+              [routerLink]="['/booking-history']"
+              routerLinkActive="active"
+              [routerLinkActiveOptions]="{ exact: true }"
+              class="menuTitle"
+              (click)="navbarCollapsed = true"
+              >Historial de Reservas</a
             >
           </li>
           <li *ngIf="ValidateRole('Vehículos')">

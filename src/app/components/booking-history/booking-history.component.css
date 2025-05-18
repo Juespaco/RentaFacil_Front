@@ -1,0 +1,8 @@
+  .btnClear{
+    margin-left: 1%;
+  }
+
+  .sortable {
+  cursor: pointer;
+  user-select: none;
+}

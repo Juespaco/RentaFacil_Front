@@ -8,6 +8,10 @@ import { Vehicle } from '../../models/vehicle';
 import { vehicleAvailability } from '../../models/vehicleAvailability';
 import { ClientService } from '../../services/client.service';
 import { client } from '../../models/client';
+import { BookingService } from '../../services/booking.service';
+import { JwtService } from '../../services/jwt.service';
+import { BookingRequest } from '../../models/bookingRequest';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-booking',
@@ -28,7 +32,9 @@ export class BookingComponent implements AfterViewInit {
 
   constructor(
     private vehicleService:VehicleService,
-    private clientService:ClientService
+    private clientService:ClientService,
+    private bookingService:BookingService,
+    private jwtService: JwtService
   ){
     this.getVehicleTypes();
   }
@@ -109,10 +115,34 @@ export class BookingComponent implements AfterViewInit {
     }
   }
 
-  confirmarReserva() {
-    alert("Reserva confirmada. Aquí puedes enviar los datos al backend.");
-    // Aquí iría la lógica para guardar la reserva
-  }
+  BookingConfirmation(): void {
+  const payload: BookingRequest = {
+    vehicleId: this.selectedVehicleId,
+    startDate: this.vehicleAvailability.StartDate!,
+    endDate:   this.vehicleAvailability.EndDate!,
+    client:    this.client,
+    employeeId: this.jwtService.getClaim(localStorage.getItem('access_token')??'','employeeId')
+  };
+  this.bookingService.createBooking(payload).subscribe({
+    next: () => {
+      this.resetWizard();
+      Swal.fire({
+        icon: 'success',
+        text: 'Reserva creada con éxito',
+        showConfirmButton: true,
+        confirmButtonColor: '#06100D',
+      });
+    },
+    error: err => {
+      Swal.fire({
+        icon: 'error',
+        text: 'Error al crear la reserva',
+        showConfirmButton: true,
+        confirmButtonColor: '#06100D',
+      });
+    },
+  });
+}
 
   getVehicleTypes() {
     this.vehicleService.getVehicleTypes().subscribe((response) => {
@@ -153,4 +183,24 @@ export class BookingComponent implements AfterViewInit {
     const diffInDays = diffInMs / (1000 * 60 * 60 * 24);
     return diffInDays + 1 ;
   }
+
+  /* PASO 2 completo */
+  isStep2Complete(): boolean {
+    return (
+      !!this.client.document?.trim() &&
+      !!this.client.fullName?.trim() &&
+      !!this.client.phone?.trim() &&
+      !!this.client.email?.trim()
+    );
+  }
+
+  private resetWizard(): void {
+    this.currentStep = 1;
+    this.vehicleAvailability = new vehicleAvailability();
+    this.availableVehicles   = [];
+    this.selectedVehicleId   = 0;
+    this.client              = new client();
+    this.toggleSteps(1);              // vuelve a la vista del paso 1
+  }
+
 }

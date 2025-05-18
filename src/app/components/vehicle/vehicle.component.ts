@@ -5,9 +5,8 @@ import { Vehicle } from '../../models/vehicle';
 import Swal from 'sweetalert2';
 import { Router } from '@angular/router';
 import { ViewportScroller } from '@angular/common';
-import 'datatables.net';
 import { VehicleService } from '../../services/vehicle.service';
-declare var $: any;
+import { vehicleType } from '../../models/vehicleType';
 
 @Component({
   selector: 'app-vehicle',
@@ -17,7 +16,6 @@ declare var $: any;
   styleUrl: './vehicle.component.css',
 })
 export class VehicleComponent {
-  vehiclesToSearch: Vehicle[] = [];
   vehicles: Vehicle[] = [];
   vehicleForm: Vehicle = new Vehicle();
   buscarID: number = 0;
@@ -25,69 +23,72 @@ export class VehicleComponent {
   selectedVehicle: Vehicle | null = null;
   textButton = 'Registrar';
   selectedVehicleIdSearch: string | undefined;
+  vehicleTypes: vehicleType[];
+  currentPage:number = 1;
+  itemsPerPage:number = 5;
+
+  sortColumn: string = '';
+  sortDirection: 'asc' | 'desc' = 'asc';
 
   constructor(
-    private vehicleService:VehicleService,
+    private vehicleService: VehicleService,
     private router: Router,
     private viewportScroller: ViewportScroller
   ) {
+    this.getVehicleTypes();
     this.getVehicles();
+  }
+
+  get sortedVehicles(): Vehicle[] {
+    return [...this.vehicles].sort((a, b) => {
+      const valueA = a[this.sortColumn as keyof Vehicle];
+      const valueB = b[this.sortColumn as keyof Vehicle];
+
+
+      if (valueA == null) return 1;
+      if (valueB == null) return -1;
+
+      if (typeof valueA === 'number' && typeof valueB === 'number') {
+        return this.sortDirection === 'asc' ? valueA - valueB : valueB - valueA;
+      }
+
+      return this.sortDirection === 'asc'
+        ? valueA.toString().localeCompare(valueB.toString())
+        : valueB.toString().localeCompare(valueA.toString());
+    });
+  }
+
+  sortData(column: string) {
+    if (this.sortColumn === column) {
+      this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.sortColumn = column;
+      this.sortDirection = 'asc';
+    }
+  }
+
+  getVehicles() {
+    this.vehicleService.getVehicles().subscribe((response) => {
+      this.vehicles = response;
+    });
+  }
+
+  getVehicleTypes() {
+    this.vehicleService.getVehicleTypes().subscribe((response) => {
+      this.vehicleTypes = response;
+    });
   }
 
   manageRequestForm() {
     if (this.editMode) {
-      // Modo de edición
       this.updateVehicle();
     } else {
-      // Modo de creación
       this.insertVehicle();
     }
   }
 
   searchVehicle() {
     this.getVehicles();
-  }
-
-  getVehicles() {
-    this.vehicleService.getVehicles().subscribe((response) => {
-      this.vehicles = response;
-
-      setTimeout(() => {
-        // const table = $('#vehicleTable').DataTable();
-        // if (table) {
-        //   table.destroy();
-        // }
-
-        setTimeout(() => {
-          $('#vehicleTable').DataTable({
-            pagingType: 'full_numbers',
-            pageLength: 5,
-            processing: true,
-            lengthMenu: [5, 10, 25],
-            language: {
-              decimal: '',
-              emptyTable: 'No hay información',
-              info: 'Mostrando _START_ a _END_ de _TOTAL_ Entradas',
-              infoEmpty: 'Mostrando 0 a 0 de 0 Entradas',
-              infoFiltered: '(Filtrado de _MAX_ total entradas)',
-              infoPostFix: '',
-              thousands: ',',
-              lengthMenu: 'Mostrar _MENU_ Entradas',
-              loadingRecords: 'Cargando...',
-              processing: 'Procesando...',
-              search: 'Buscar:',
-              zeroRecords: 'Sin resultados encontrados',
-              paginate: {
-                first: '<<',
-                last: '>>',
-                next: '>',
-                previous: '<',
-              },
-            },
-          });
-        }, 0);
-      }, 0);
-    });
   }
 
   insertVehicle() {
@@ -99,7 +100,7 @@ export class VehicleComponent {
           showConfirmButton: true,
           confirmButtonColor: '#06100D',
         });
-        
+
         this.getVehicles();
         this.cleanForm();
       },
@@ -114,10 +115,6 @@ export class VehicleComponent {
     );
   }
 
-  /**
-   * Llena el formulario con los datos del usuario seleccionado
-   * @param vehicle
-   */
   editVehicle(vehicle: Vehicle) {
     this.editMode = true;
     this.selectedVehicle = vehicle;
@@ -134,7 +131,7 @@ export class VehicleComponent {
           showConfirmButton: true,
           confirmButtonColor: '#06100D',
         });
-        
+
         this.getVehicles();
         this.cleanForm();
       },
@@ -149,16 +146,8 @@ export class VehicleComponent {
     );
   }
 
-  /**
-   * Limpia los campos del formulario y resetea nombre de boton a Registrar
-   */
   cleanForm() {
-    this.vehicleForm.plateNumber = '';
-    this.vehicleForm.brand = '';
-    this.vehicleForm.model = '';
-    this.vehicleForm.year = 0;
-    this.vehicleForm.vehicleTypeId = 0;
-    this.vehicleForm.bookingValuePerDay = 0;
+    this.vehicleForm = new Vehicle();
     this.editMode = false;
     this.selectedVehicle = null;
     this.textButton = 'Registrar';
@@ -167,14 +156,26 @@ export class VehicleComponent {
   validateVehicleFields() {
     try {
       if (
-        !this.vehicleForm.plateNumber.trim()||
+        !this.vehicleForm.plateNumber.trim() ||
         !this.vehicleForm.brand.trim() ||
         !this.vehicleForm.model.trim() ||
         !this.vehicleForm.year ||
         !this.vehicleForm.vehicleTypeId ||
-        !this.vehicleForm.bookingValuePerDay 
+        !this.vehicleForm.bookingValuePerDay
       ) {
+        Swal.fire({
+          icon: 'warning',
+          text: 'todos los campos deben estar llenos',
+          showConfirmButton: true,
+          confirmButtonColor: '#06100D',
+        });
         return false;
+      } else {
+        if (this.editMode) {
+          this.updateVehicle();
+        } else {
+          this.insertVehicle();
+        }
       }
     } catch (error) {
       return false;
@@ -182,41 +183,6 @@ export class VehicleComponent {
 
     return true;
   }
-
-  deleteVehicle(idVehicle: number) {
-    var Vehicle = this.vehicles.find((Vehicle) => Vehicle.id === idVehicle);
-    Swal.fire({
-      title: 'Eliminar usuario',
-      text: 'Deseas eliminar a ' + Vehicle?.plateNumber + '?',
-      icon: 'question',
-      showDenyButton: true,
-      confirmButtonColor: '#06100D',
-    }).then((result) => {
-      if (result.isConfirmed) {
-        /*this.VehicleService.deleteVehicle(idVehicle).subscribe(
-          (response) => {
-            Swal.fire({
-              title: 'Eliminado correctamente!',
-              text: 'El usuario ha sido eliminado',
-              icon: 'success',
-              confirmButtonColor: '#06100D',
-            });
-            this.getVehicles(); // Actualiza la lista después de eliminar un usuario
-          },
-          (error) => {
-            Swal.fire({
-              icon: 'error',
-              text: 'No se pudo eliminar el usuario',
-              showConfirmButton: true,
-              confirmButtonColor: '#06100D',
-            });
-          }
-        );*/
-      }
-    });
-  }
-
-  validateVehicle() {}
 
   scrollToTop() {
     this.viewportScroller.scrollToPosition([0, 0]);
@@ -227,5 +193,17 @@ export class VehicleComponent {
     this.editMode = false;
     this.selectedVehicle = new Vehicle();
     this.textButton = 'Registrar';
+  }
+
+  
+
+  get paginatedVehicles(): Vehicle[] {
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    return this.sortedVehicles.slice(startIndex, startIndex + this.itemsPerPage);
+  }
+
+  get totalPages(): number[] {
+    const total = Math.ceil(this.sortedVehicles.length / this.itemsPerPage);
+    return Array.from({ length: total }, (_, i) => i + 1);
   }
 }

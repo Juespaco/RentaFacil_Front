@@ -8,7 +8,7 @@ import {
 import { Router } from '@angular/router';
 import { Observable, catchError, throwError } from 'rxjs';
 
-export const jWTInterceptorInterceptor: HttpInterceptorFn = (
+export const JWTInterceptor: HttpInterceptorFn = (
   req: HttpRequest<any>,
   next: HttpHandlerFn
 ): Observable<HttpEvent<any>> => {

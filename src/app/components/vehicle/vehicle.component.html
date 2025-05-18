@@ -58,14 +58,10 @@
           </div>
           <div class="form-group col-12 col-md-6 p-3">
             <label>*Tipo</label>
-            <input
-              [(ngModel)]="vehicleForm.vehicleTypeId"
-              name="vehicleTypeId"
-              type="text"
-              class="form-control"
-              id="vehicleTypeId"
-              placeholder="Tipo"
-            />
+            <select id="tipoVehiculo" class="form-select"  name="vehicleTypeId"[(ngModel)]="vehicleForm.vehicleTypeId">
+              <option value="0" selected disabled>Seleccione un tipo</option>
+              <option *ngFor="let type of vehicleTypes" [value]="type.id">{{type.name}}</option>
+            </select>
           </div>
           <div class="form-group col-12 col-md-6 p-3">
             <label>*Valor por dia</label>
@@ -80,7 +76,7 @@
           </div>
           <div class="row">
             <div class="col-12 text-center features-item">
-              <button type="submit" class="btn btn-get-started" (click)="validateVehicle()">
+              <button type="submit" class="btn btn-get-started" (click)="validateVehicleFields()">
                 {{ textButton }}
               </button>
               <button class="btn btn-get-started btnClear" (click)="clear()">
@@ -102,18 +98,17 @@
           >
             <thead>
               <tr>
-                <th scope="col">Placa</th>
-                <th scope="col">Marca</th>
-                <th scope="col">Modelo</th>
-                <th scope="col">Año</th>
-                <th scope="col">Tipo</th>
-                <th scope="col">Valor por dia</th>
-                <th scope="col">Acciones</th>
+                <th (click)="sortData('plateNumber')">Placa</th>
+                <th (click)="sortData('brand')">Marca</th>
+                <th (click)="sortData('model')">Modelo</th>
+                <th (click)="sortData('year')">Año</th>
+                <th (click)="sortData('vehicleTypeId')">Tipo</th>
+                <th (click)="sortData('bookingValuePerDay')">Valor por día</th>
+                <th>Acciones</th>
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let vehicle of vehicles">
-                
+              <tr *ngFor="let vehicle of paginatedVehicles">
                 <td>{{ vehicle.plateNumber }}</td>
                 <td>{{ vehicle.brand }}</td>
                 <td>{{ vehicle.model }}</td>
@@ -121,21 +116,35 @@
                 <td>{{ vehicle.vehicleTypeId }}</td>
                 <td>{{ vehicle.bookingValuePerDay }}</td>
                 <td class="text-center">
-                  <button
-                    (click)="editVehicle(vehicle)" (click)="scrollToTop()"
+                  <button (click)="editVehicle(vehicle); scrollToTop()"
                     class="btn-icon-btn-shadow-btn-circle bi bi-pencil-square"
-                    data-bs-toggle="tooltip" data-bs-placement="top" title="Editar"
-                  ></button>
-
-                  <button
-                    (click)="deleteVehicle(vehicle.id)"
-                    class="btn-icon-btn-shadow-btn-circle bi bi-trash3-fill"
-                    data-bs-toggle="tooltip" data-bs-placement="top" title="Eliminar"
-                  ></button>
+                    data-bs-toggle="tooltip" data-bs-placement="top" title="Editar">
+                  </button>
                 </td>
               </tr>
             </tbody>
           </table>
+          <nav class="mt-3">
+            <ul class="pagination justify-content-center">
+              <li class="page-item" [class.disabled]="currentPage === 1">
+                <button class="page-link" (click)="currentPage = currentPage - 1" [disabled]="currentPage === 1">
+                  &laquo;
+                </button>
+              </li>
+              <li
+                class="page-item"
+                *ngFor="let page of totalPages"
+                [class.active]="page === currentPage"
+              >
+                <button class="page-link" (click)="currentPage = page">{{ page }}</button>
+              </li>
+              <li class="page-item" [class.disabled]="currentPage === totalPages.length">
+                <button class="page-link" (click)="currentPage = currentPage + 1" [disabled]="currentPage === totalPages.length">
+                  &raquo;
+                </button>
+              </li>
+            </ul>
+          </nav>
         </div>
       </div>
     </div>

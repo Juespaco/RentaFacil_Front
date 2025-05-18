@@ -40,24 +40,24 @@
                 <h4>Paso 2: Datos del cliente</h4>
                 <div class="mb-3">
                     <label for="documento" class="form-label">Documento</label>
-                    <input type="text" id="documento" class="form-control" [(ngModel)]="client.document" (blur)="getClientByDocument()">
+                    <input type="text" id="documento" name="documento" class="form-control" required [(ngModel)]="client.document" (blur)="getClientByDocument()">
                 </div>
                 <div class="mb-3">
                     <label for="nombre" class="form-label">Nombre completo</label>
-                    <input type="text" id="nombre" class="form-control" [(ngModel)]="client.fullName">
+                    <input type="text" id="nombre" name="nombre" required class="form-control" [(ngModel)]="client.fullName">
                 </div>
                 <div class="mb-3">
                     <label for="telefono" class="form-label">Teléfono</label>
-                    <input type="text" id="telefono" class="form-control" [(ngModel)]="client.email">
+                    <input type="text" id="telefono" name="telefono" required class="form-control" [(ngModel)]="client.phone">
                 </div>
                 <div class="mb-3">
                     <label for="email" class="form-label">Correo electrónico</label>
-                    <input type="email" id="email" class="form-control" [(ngModel)]="client.phone">
+                    <input type="email" id="email" name="email" required class="form-control" [(ngModel)]="client.email">
                 </div>
             </div>
             <div class="d-flex justify-content-end gap-2 mt-3">
                 <button class="btn btn-secondary" (click)="prevStep(1)">Anterior</button>
-                <button class="btn btn-primary" (click)="nextStep(3)">Siguiente</button>
+                <button *ngIf="isStep2Complete()" class="btn btn-primary" (click)="nextStep(3)">Siguiente</button>
             </div>
         </div>
 
@@ -74,7 +74,7 @@
             </div>
             <div class="d-flex justify-content-end gap-2 mt-3">
                 <button class="btn btn-secondary" (click)="prevStep(2)">Anterior</button>
-                <button class="btn btn-success" (click)="confirmarReserva()">Confirmar y Guardar</button>
+                <button class="btn btn-success" (click)="BookingConfirmation()">Confirmar y Guardar</button>
             </div>
         </div>
     </div>
